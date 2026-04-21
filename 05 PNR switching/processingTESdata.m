@@ -7,94 +7,7 @@ if(~isdeployed)
   cd(fileparts(matlab.desktop.editor.getActiveFilename));
 end
 
-load("power50.mat"); % Data collected with TESs
-
-%%
-
-switchedPort = squeeze(arrayOfPhotonNumbers(2,:,:));
-unswitchedPort = squeeze(arrayOfPhotonNumbers(1,:,:));
-idlerPort = squeeze(arrayOfPhotonNumbers(3,:,:)+arrayOfPhotonNumbers(4,:,:));
-
-tic
-ind1=1;
-ind2=ind1+99999;
-for i=1:1:1000000/100000 % Break up data into chunks
-
-    for j = 1:1:101
-        idlerChunk = idlerPort(ind1:ind2,j);
-        switchedChunk = switchedPort(ind1:ind2,j);
-        unswitchedChunk = unswitchedPort(ind1:ind2,j);
-        
-        % N = 1
-        idlerInd1 = find(idlerChunk==1);
-        switchedInd1 = find(switchedChunk==1);
-        unswitchedInd1 = find(unswitchedChunk==1);
-        switchedInd0 = find(switchedChunk==0);
-        unswitchedInd0 = find(unswitchedChunk==0);
-        
-        P01(i,j) = length(intersect(intersect(switchedInd0,unswitchedInd1),idlerInd1));
-        P10(i,j) = length(intersect(intersect(switchedInd1,unswitchedInd0),idlerInd1));
-        
-        % N = 2
-        idlerInd2 = find(idlerChunk==2);
-        switchedInd2 = find(switchedChunk==2);
-        unswitchedInd2 = find(unswitchedChunk==2);
-        
-        P02(i,j) = length(intersect(intersect(switchedInd0,unswitchedInd2),idlerInd2));
-        P20(i,j) = length(intersect(intersect(switchedInd2,unswitchedInd0),idlerInd2));
-        P11(i,j) = length(intersect(intersect(switchedInd1,unswitchedInd1),idlerInd2));
-        
-        % N = 3
-        idlerInd3 = find(idlerChunk==3);
-        switchedInd3 = find(switchedChunk==3);
-        unswitchedInd3 = find(unswitchedChunk==3);
-        
-        P03(i,j) = length(intersect(intersect(switchedInd0,unswitchedInd3),idlerInd3));
-        P30(i,j) = length(intersect(intersect(switchedInd3,unswitchedInd0),idlerInd3));
-        P12(i,j) = length(intersect(intersect(switchedInd1,unswitchedInd2),idlerInd3));
-        P21(i,j) = length(intersect(intersect(switchedInd2,unswitchedInd1),idlerInd3));
-        
-        % N = 4
-        idlerInd4 = find(idlerChunk==4);
-        switchedInd4 = find(switchedChunk==4);
-        unswitchedInd4 = find(unswitchedChunk==4);
-        
-        P04(i,j) = length(intersect(intersect(switchedInd0,unswitchedInd4),idlerInd4));
-        P40(i,j) = length(intersect(intersect(switchedInd4,unswitchedInd0),idlerInd4));
-        P13(i,j) = length(intersect(intersect(switchedInd1,unswitchedInd3),idlerInd4));
-        P22(i,j) = length(intersect(intersect(switchedInd2,unswitchedInd2),idlerInd4));
-        P31(i,j) = length(intersect(intersect(switchedInd3,unswitchedInd1),idlerInd4));
-        
-        % N = 5
-        idlerInd5 = find(idlerChunk==5);
-        switchedInd5 = find(switchedChunk==5);
-        unswitchedInd5= find(unswitchedChunk==5);
-        
-        P05(i,j) = length(intersect(intersect(switchedInd0,unswitchedInd5),idlerInd5));
-        P50(i,j) = length(intersect(intersect(switchedInd5,unswitchedInd0),idlerInd5));
-        P14(i,j) = length(intersect(intersect(switchedInd1,unswitchedInd4),idlerInd5));
-        P23(i,j) = length(intersect(intersect(switchedInd2,unswitchedInd3),idlerInd5));
-        P32(i,j) = length(intersect(intersect(switchedInd3,unswitchedInd2),idlerInd5));
-        P41(i,j) = length(intersect(intersect(switchedInd4,unswitchedInd1),idlerInd5));
-        
-        % N = 6
-        idlerInd6 = find(idlerChunk==6);
-        switchedInd6 = find(switchedChunk==6);
-        unswitchedInd6= find(unswitchedChunk==6);
-        
-        P06(i,j) = length(intersect(intersect(switchedInd0,unswitchedInd6),idlerInd6));
-        P60(i,j) = length(intersect(intersect(switchedInd6,unswitchedInd0),idlerInd6));
-        P15(i,j) = length(intersect(intersect(switchedInd1,unswitchedInd5),idlerInd6));
-        P24(i,j) = length(intersect(intersect(switchedInd2,unswitchedInd4),idlerInd6));
-        P33(i,j) = length(intersect(intersect(switchedInd3,unswitchedInd3),idlerInd6));
-        P42(i,j) = length(intersect(intersect(switchedInd4,unswitchedInd2),idlerInd6));
-        P51(i,j) = length(intersect(intersect(switchedInd5,unswitchedInd1),idlerInd6));
-        
-    end
-    ind1=ind2+1;
-    ind2=ind1+99999;
-    toc
-end
+load("PNRswitching.mat"); % Data collected with TESs
 
 %% Calculate mean and avg of each photon number combination
 P01avg = mean(P01./(P01+P10));
@@ -159,7 +72,6 @@ P60avg = mean(P60./(P06+P60+P15+P24+P33+P42+P51));
 P60std = std(P60./(P06+P60+P15+P24+P33+P42+P51));
 
 %%
-delay = 0.5:0.01:1.5;
 tau = (delay-0.91)*10^(-3)*2/3e8*10^12; % delay in ps
 
 figure('Position', [100, 100, 1400, 800]); 
